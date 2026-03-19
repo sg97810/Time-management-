@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T09:03:40.678Z",
+  "lastSynced": "2026-03-19T09:04:02.837Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -97,6 +97,13 @@
         {
           "id": 1773911017676,
           "text": "Car parking ticket",
+          "cat": "personal",
+          "prio": "high",
+          "done": false
+        },
+        {
+          "id": 1773911039836,
+          "text": "PR job verification",
           "cat": "personal",
           "prio": "high",
           "done": false
