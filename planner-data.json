@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T09:04:02.837Z",
+  "lastSynced": "2026-03-19T09:04:16.150Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -104,6 +104,13 @@
         {
           "id": 1773911039836,
           "text": "PR job verification",
+          "cat": "personal",
+          "prio": "high",
+          "done": false
+        },
+        {
+          "id": 1773911053146,
+          "text": "PR language test",
           "cat": "personal",
           "prio": "high",
           "done": false
