@@ -17,7 +17,13 @@
   --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
   --shadow-md:0 2px 8px rgba(0,0,0,.08),0 8px 32px rgba(0,0,0,.06);
   --r:10px;--r-lg:16px;
-  --safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom);
+  /* Safe area — iPhone Dynamic Island / notch aware */
+  --safe-t:env(safe-area-inset-top, 0px);
+  --safe-b:env(safe-area-inset-bottom, 0px);
+  --safe-l:env(safe-area-inset-left, 0px);
+  --safe-r:env(safe-area-inset-right, 0px);
+  /* Topbar height = safe-area + content (60px) */
+  --topbar-h:calc(var(--safe-t) + 60px);
 }
 [data-theme="dark"]{
   --bg:#111110;--paper:#1a1917;--surface:#222220;--border:#2e2c29;--border2:#3d3b37;
@@ -26,23 +32,44 @@
   --shadow-md:0 2px 8px rgba(0,0,0,.4),0 8px 32px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:calc(var(--safe-t)+64px);padding-bottom:calc(var(--safe-b)+24px);transition:background .3s,color .3s}
+html{height:-webkit-fill-available}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;min-height:-webkit-fill-available;
+  padding-top:var(--topbar-h);
+  padding-bottom:calc(var(--safe-b) + 32px);
+  padding-left:var(--safe-l);padding-right:var(--safe-r);
+  transition:background .3s,color .3s;
+}
 
-/* TOPBAR */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:300;padding:calc(var(--safe-t)+10px) 24px 10px;background:rgba(250,249,246,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:background .3s}
-[data-theme="dark"] .topbar{background:rgba(17,17,16,.92)}
-.topbar-left{}
-.topbar-title{font-family:'Lora',serif;font-size:18px;font-weight:600;letter-spacing:-.3px}
-.topbar-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--t3);margin-top:1px}
-.topbar-right{display:flex;gap:8px;align-items:center}
+/* TOPBAR — fully safe-area aware for iPhone Dynamic Island & notch */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  /* Top padding = safe area (Dynamic Island / notch) + comfortable gap */
+  padding-top:calc(var(--safe-t) + 10px);
+  padding-bottom:12px;
+  padding-left:calc(var(--safe-l) + 16px);
+  padding-right:calc(var(--safe-r) + 16px);
+  background:rgba(250,249,246,.96);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;
+  transition:background .3s;
+}
+[data-theme="dark"] .topbar{background:rgba(17,17,16,.96)}
+.topbar-left{flex:1;min-width:0}
+.topbar-title{font-family:'Lora',serif;font-size:17px;font-weight:600;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);margin-top:2px;white-space:nowrap}
+.topbar-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
 
 /* SYNC BADGE */
 .sync-badge{
   display:flex;align-items:center;gap:5px;
   font-size:11px;font-weight:600;font-family:'DM Mono',monospace;
-  padding:5px 10px;border-radius:20px;border:1px solid var(--border);
+  padding:6px 10px;border-radius:20px;border:1px solid var(--border);
   background:var(--surface);color:var(--t3);cursor:pointer;
-  transition:all .2s;white-space:nowrap;
+  transition:all .2s;white-space:nowrap;flex-shrink:0;
 }
 .sync-badge:hover{border-color:var(--border2);color:var(--t2)}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .3s}
@@ -51,10 +78,20 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .sync-badge.error .sync-dot{background:#e05c7a}
 .sync-badge.offline .sync-dot{background:var(--t3)}
 @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+/* On small phones hide text to save space */
+@media(max-width:400px){.sync-label{display:none}}
 
-.icon-btn{width:34px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;font-size:16px}
+.icon-btn{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--t2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;font-size:17px;
+  /* Larger tap target for iPhone */
+  -webkit-user-select:none;user-select:none;
+}
 .icon-btn:hover{background:var(--border);color:var(--text)}
-.icon-btn:active{transform:scale(.93)}
+.icon-btn:active{transform:scale(.9);background:var(--border)}
 
 /* WRAP */
 .wrap{max-width:900px;margin:0 auto;padding:24px 20px}
@@ -155,7 +192,17 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .win-inp::placeholder{color:var(--t3)}
 
 /* OVERLAY BASE */
-.overlay-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:70px 20px 20px;overflow-y:auto}
+.overlay-bg{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
+  display:none;align-items:flex-start;justify-content:center;
+  /* Push panel below topbar + safe area — critical for Dynamic Island */
+  padding-top:calc(var(--topbar-h) + 12px);
+  padding-bottom:calc(var(--safe-b) + 20px);
+  padding-left:calc(var(--safe-l) + 16px);
+  padding-right:calc(var(--safe-r) + 16px);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
 .overlay-bg.on{display:flex}
 .overlay-panel{width:100%;max-width:620px;background:var(--paper);border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow-md);animation:slideDown .28s ease}
 @keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
@@ -220,13 +267,22 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:13px;font-weight:600;padding:10px 20px;border-radius:20px;box-shadow:var(--shadow-md);opacity:0;pointer-events:none;transition:opacity .3s;z-index:400;white-space:nowrap}
 .toast.show{opacity:1}
 
-/* RESPONSIVE */
+/* RESPONSIVE — iPhone first */
 @media(max-width:600px){
   .stats-row{grid-template-columns:1fr 1fr}
   .notes-grid,.wellness-grid{grid-template-columns:1fr}
   .review-grid,.opts-grid,.secs-grid{grid-template-columns:1fr}
-  .time-lbl{width:36px;font-size:9px}
-  .topbar-right .sync-badge span{display:none}
+  .time-lbl{width:38px;font-size:9px;padding-right:8px}
+  /* Prevent topbar right side from overflowing */
+  .topbar-right{gap:5px}
+  .sync-label{display:none}
+  /* Wrap panel full width on mobile */
+  .overlay-panel{border-radius:16px;padding:18px}
+}
+@media(max-width:360px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .stat-val{font-size:22px}
+  .stat-lbl{font-size:10px}
 }
 @media print{
   .topbar,.toast{display:none}
@@ -246,7 +302,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="topbar-right">
     <div class="sync-badge offline" id="syncBadge" onclick="openSettings('gh')" title="GitHub sync status">
       <div class="sync-dot"></div>
-      <span id="syncLabel">Not synced</span>
+      <span class="sync-label" id="syncLabel">Not synced</span>
     </div>
     <button class="icon-btn" title="Export / Print" onclick="window.print()">⬇</button>
     <button class="icon-btn" title="Settings" onclick="openSettings('main')">⚙</button>
@@ -783,7 +839,8 @@ function applySectionVisibility(){
 function syncStatus(state,msg){
   const badge=$('syncBadge');
   badge.className='sync-badge '+state;
-  $('syncLabel').textContent=msg;
+  const lbl=$('syncLabel');
+  if(lbl){ lbl.className='sync-label'; lbl.textContent=msg; }
 }
 
 function renderGHPanel(){
