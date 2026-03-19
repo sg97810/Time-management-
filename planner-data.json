@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T16:10:59.272Z",
+  "lastSynced": "2026-03-19T16:11:10.747Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -43,7 +43,7 @@
   ],
   "days": {
     "pl_day_2026-03-19": {
-      "intention": "Wake up in the morning 7am\n",
+      "intention": "Wake up in the morning 7am\nGo to gym",
       "todos": [
         {
           "id": 1773910567082,
