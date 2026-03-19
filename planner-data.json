@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T08:56:35.145Z",
+  "lastSynced": "2026-03-19T08:58:19.614Z",
   "settings": {
     "theme": "light",
     "timeFrom": 6,
@@ -50,6 +50,13 @@
           "text": "Insurance car",
           "cat": "personal",
           "prio": "high",
+          "done": false
+        },
+        {
+          "id": 1773910696603,
+          "text": "Wifi change",
+          "cat": "personal",
+          "prio": "low",
           "done": false
         }
       ],
