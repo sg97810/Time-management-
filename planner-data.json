@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T09:15:38.953Z",
+  "lastSynced": "2026-03-19T15:58:16.998Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -56,7 +56,7 @@
           "id": 1773910696603,
           "text": "Wifi change",
           "cat": "cat_1773910720090",
-          "prio": "low",
+          "prio": "med",
           "done": false
         },
         {
