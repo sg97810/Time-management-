@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T09:00:21.529Z",
+  "lastSynced": "2026-03-19T09:00:55.185Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -65,6 +65,13 @@
           "cat": "personal",
           "prio": "med",
           "done": false
+        },
+        {
+          "id": 1773910849349,
+          "text": "Deltal cleaning appointment",
+          "cat": "personal",
+          "prio": "low",
+          "done": true
         }
       ],
       "slots": {},
