@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T09:06:13.080Z",
+  "lastSynced": "2026-03-19T09:06:29.356Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -132,9 +132,9 @@
         {
           "id": 1773911170079,
           "text": "House tenets find",
-          "cat": "personal",
+          "cat": "cat_1773910720090",
           "prio": "high",
-          "done": false
+          "done": true
         }
       ],
       "slots": {},
