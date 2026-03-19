@@ -1,0 +1,45 @@
+{
+  "version": 2,
+  "lastSynced": "2026-03-19T08:37:51.566Z",
+  "settings": {
+    "theme": "light",
+    "timeFrom": 6,
+    "timeTo": 21,
+    "showNow": true,
+    "autoSave": true,
+    "hiddenSections": []
+  },
+  "categories": [
+    {
+      "id": "deep",
+      "name": "Deep Work",
+      "color": "#4a90e2"
+    },
+    {
+      "id": "meet",
+      "name": "Meetings",
+      "color": "#50c878"
+    },
+    {
+      "id": "admin",
+      "name": "Admin",
+      "color": "#f4a223"
+    },
+    {
+      "id": "health",
+      "name": "Health",
+      "color": "#e05c7a"
+    },
+    {
+      "id": "learn",
+      "name": "Learning",
+      "color": "#7c6af7"
+    },
+    {
+      "id": "personal",
+      "name": "Personal",
+      "color": "#20b2aa"
+    }
+  ],
+  "days": {}
+}
