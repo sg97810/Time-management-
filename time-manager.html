@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="FocusFlow" />
+<meta name="theme-color" content="#0a0a0f" />
+<title>FocusFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c6af7;
+    --accent2: #f76a8a;
+    --accent3: #6af7c8;
+    --text: #f0f0f8;
+    --muted: #888899;
+    --safe-top: env(safe-area-inset-top);
+    --safe-bot: env(safe-area-inset-bottom);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    padding-top: var(--safe-top);
+    padding-bottom: calc(var(--safe-bot) + 70px);
+  }
+
+  /* Background ambient glow */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(124,106,247,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    padding: 16px 20px 12px;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header .logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+  .header .logo span { color: var(--accent); }
+  .header .date-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 10px;
+  }
+
+  /* PAGES */
+  .page { display: none; padding: 20px; animation: fadeUp 0.3s ease; }
+  .page.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--muted); margin-bottom: 12px;
+  }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px;
+    position: relative; overflow: hidden;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .stat-card:nth-child(1)::after { background: var(--accent); }
+  .stat-card:nth-child(2)::after { background: var(--accent2); }
+  .stat-card:nth-child(3)::after { background: var(--accent3); }
+  .stat-card:nth-child(4)::after { background: #f7c46a; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* TIMER CARD */
+  .timer-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px 20px;
+    text-align: center; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+  }
+  .timer-glow {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(124,106,247,0.15) 0%, transparent 70%);
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+  .timer-glow.active { opacity: 1; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 1; } 50% { transform: translate(-50%,-50%) scale(1.2); opacity: 0.6; } }
+  .timer-label { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .timer-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 64px; font-weight: 700; line-height: 1;
+    letter-spacing: -2px; margin-bottom: 8px;
+    position: relative; z-index: 1;
+  }
+  .timer-mode { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .mode-pills { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .mode-pill {
+    font-size: 12px; padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .mode-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .timer-controls { display: flex; gap: 12px; justify-content: center; align-items: center; }
+  .btn-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .btn-circle:active { transform: scale(0.92); }
+  .btn-start {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--accent); border: none;
+    color: #fff; font-size: 24px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; box-shadow: 0 0 24px rgba(124,106,247,0.4);
+  }
+  .btn-start:active { transform: scale(0.92); }
+  .btn-start.running { background: var(--accent2); box-shadow: 0 0 24px rgba(247,106,138,0.4); }
+
+  /* TASK INPUT */
+  .task-form { margin-bottom: 20px; }
+  .input-row { display: flex; gap: 10px; }
+  .task-input {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 16px;
+    color: var(--text); font-family: 'Sora', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .task-input:focus { border-color: var(--accent); }
+  .task-input::placeholder { color: var(--muted); }
+  .btn-add {
+    background: var(--accent); border: none; border-radius: 12px;
+    color: #fff; font-size: 20px; width: 46px;
+    cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-add:active { transform: scale(0.92); }
+
+  /* PRIORITY SELECTOR */
+  .priority-row { display: flex; gap: 8px; margin-top: 10px; }
+  .prio-btn {
+    font-size: 11px; padding: 5px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .prio-btn.selected-high { border-color: var(--accent2); color: var(--accent2); background: rgba(247,106,138,0.1); }
+  .prio-btn.selected-med { border-color: #f7c46a; color: #f7c46a; background: rgba(247,196,106,0.1); }
+  .prio-btn.selected-low { border-color: var(--accent3); color: var(--accent3); background: rgba(106,247,200,0.1); }
+
+  /* TASK LIST */
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
+  .task-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    transition: all 0.3s; animation: slideIn 0.25s ease;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  .task-item.done { opacity: 0.4; }
+  .task-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); background: transparent;
+    cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .task-check.done { background: var(--accent3); border-color: var(--accent3); }
+  .task-check.done::after { content: '✓'; font-size: 12px; color: #0a0a0f; font-weight: 700; }
+  .task-body { flex: 1; }
+  .task-text { font-size: 14px; line-height: 1.4; }
+  .task-text.done { text-decoration: line-through; }
+  .task-meta { display: flex; gap: 6px; margin-top: 4px; align-items: center; }
+  .prio-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .prio-dot.high { background: var(--accent2); }
+  .prio-dot.med { background: #f7c46a; }
+  .prio-dot.low { background: var(--accent3); }
+  .task-time { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .task-del {
+    background: none; border: none; color: var(--muted);
+    font-size: 16px; cursor: pointer; padding: 4px;
+    transition: color 0.2s; flex-shrink: 0;
+  }
+  .task-del:active { color: var(--accent2); }
+
+  /* SCHEDULE / BLOCKS */
+  .block-form { margin-bottom: 20px; }
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .form-row .task-input { font-size: 13px; }
+  .time-input { font-family: 'Space Mono', monospace; font-size: 13px; }
+  .block-list { display: flex; flex-direction: column; gap: 8px; }
+  .block-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    animation: slideIn 0.25s ease;
+  }
+  .block-time-col { text-align: center; flex-shrink: 0; }
+  .block-start { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; }
+  .block-end { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+  .block-bar { width: 3px; height: 36px; border-radius: 4px; flex-shrink: 0; }
+  .block-body { flex: 1; }
+  .block-name { font-size: 14px; }
+  .block-dur { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .block-del { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px; }
+
+  /* HABITS */
+  .habit-form { margin-bottom: 20px; }
+  .habit-grid { display: grid; gap: 10px; }
+  .habit-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px;
+    animation: slideIn 0.25s ease;
+  }
+  .habit-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .habit-name { font-size: 15px; font-weight: 600; }
+  .habit-streak { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); }
+  .habit-week { display: flex; gap: 6px; }
+  .habit-day {
+    flex: 1; aspect-ratio: 1; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--muted); transition: all 0.2s;
+    font-family: 'Space Mono', monospace;
+  }
+  .habit-day.done { background: var(--accent3); border-color: var(--accent3); color: #0a0a0f; font-weight: 700; }
+  .habit-del { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; }
+
+  /* INSTALL BANNER */
+  .install-banner {
+    margin: 0 0 20px;
+    background: linear-gradient(135deg, rgba(124,106,247,0.15), rgba(247,106,138,0.1));
+    border: 1px solid rgba(124,106,247,0.3);
+    border-radius: 16px; padding: 16px;
+    font-size: 13px; line-height: 1.6; color: var(--muted);
+  }
+  .install-banner strong { color: var(--text); display: block; margin-bottom: 6px; font-size: 14px; }
+  .install-banner .step { margin-top: 6px; display: flex; gap: 8px; align-items: flex-start; }
+  .install-banner .step-num {
+    background: var(--accent); color: #fff; border-radius: 50%;
+    width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding-bottom: var(--safe-bot);
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0 8px;
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; transition: color 0.2s; font-family: 'Sora', sans-serif;
+  }
+  .nav-btn.active { color: var(--accent); }
+  .nav-icon { font-size: 20px; margin-bottom: 3px; }
+  .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
+
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.4; }
+  .empty-text { font-size: 14px; }
+
+  /* COLOR PICKER ROW for blocks */
+  .color-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .color-swatch {
+    width: 28px; height: 28px; border-radius: 8px;
+    cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .color-swatch.selected { border-color: #fff; transform: scale(1.15); }
+
+  /* Progress ring on timer */
+  .timer-ring-wrap { position: relative; display: inline-block; margin-bottom: 8px; }
+  svg.ring { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  circle.ring-bg { fill: none; stroke: var(--border); stroke-width: 4; }
+  circle.ring-fill { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Focus<span>Flow</span></div>
+  <div class="date-pill" id="headerDate"></div>
+</div>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Tasks Done</div>
+      <div class="stat-value" id="statDone">0</div>
+      <div class="stat-sub">today</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Focus Time</div>
+      <div class="stat-value" id="statFocus">0m</div>
+      <div class="stat-sub">pomodoros</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value" id="statPending">0</div>
+      <div class="stat-sub">tasks left</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Streak</div>
+      <div class="stat-value" id="statStreak">0🔥</div>
+      <div class="stat-sub">day streak</div>
+    </div>
+  </div>
+
+  <div class="section-title">Quick Add Task</div>
+  <div class="task-form">
+    <div class="input-row">
+      <input class="task-input" id="quickTaskInput" placeholder="Add a task…" />
+      <button class="btn-add" onclick="addTask()">+</button>
+    </div>
+    <div class="priority-row">
+      <button class="prio-btn" id="prioHigh" onclick="setPrio('high')">🔴 High</button>
+      <button class="prio-btn" id="prioMed" onclick="setPrio('med')">🟡 Medium</button>
+      <button class="prio-btn" id="prioLow" onclick="setPrio('low')">🟢 Low</button>
+    </div>
+  </div>
+
+  <div class="section-title">Today's Tasks</div>
+  <div class="task-list" id="taskList"></div>
+</div>
+
+<!-- TIMER PAGE -->
+<div class="page" id="page-timer">
+  <div class="timer-card">
+    <div class="timer-glow" id="timerGlow"></div>
+    <div class="timer-label">Focus Session</div>
+    <div class="timer-ring-wrap">
+      <svg class="ring" width="0" height="0" id="ringsvg"><circle class="ring-bg" id="ringBg"/><circle class="ring-fill" id="ringFill"/></svg>
+      <div class="timer-display" id="timerDisplay">25:00</div>
+    </div>
+    <div class="mode-pills">
+      <button class="mode-pill active" onclick="setMode('focus',25)">Focus 25m</button>
+      <button class="mode-pill" onclick="setMode('short',5)">Break 5m</button>
+      <button class="mode-pill" onclick="setMode('long',15)">Long 15m</button>
+      <button class="mode-pill" onclick="setMode('custom',0)">Custom</button>
+    </div>
+    <div class="timer-controls">
+      <button class="btn-circle" onclick="resetTimer()">↺</button>
+      <button class="btn-start" id="startBtn" onclick="toggleTimer()">▶</button>
+      <button class="btn-circle" onclick="skipTimer()">⏭</button>
+    </div>
+  </div>
+
+  <div class="section-title">Sessions Today</div>
+  <div id="sessionLog" style="display:flex;flex-direction:column;gap:8px;"></div>
+</div>
+
+<!-- SCHEDULE PAGE -->
+<div class="page" id="page-schedule">
+  <div class="section-title">Add Time Block</div>
+  <div class="block-form">
+    <div class="form-row">
+      <input class="task-input" id="blockName" placeholder="Block name…" style="flex:2" />
+    </div>
+    <div class="form-row">
+      <input class="task-input time-input" id="blockStart" type="time" />
+      <input class="task-input time-input" id="blockEnd" type="time" />
+    </div>
+    <div class="color-row">
+      <div class="color-swatch selected" style="background:#7c6af7" data-col="#7c6af7" onclick="pickColor(this)"></div>
+      <div class="color-swatch" style="background:#f76a8a" data-col="#f76a8a" onclick="pickColor(this)"></div>
+      <div class="color-swatch" style="background:#6af7c8" data-col="#6af7c8" onclick="pickColor(this)"></div>
+      <div class="color-swatch" style="background:#f7c46a" data-col="#f7c46a" onclick="pickColor(this)"></div>
+      <div class="color-swatch" style="background:#6ab8f7" data-col="#6ab8f7" onclick="pickColor(this)"></div>
+      <div class="color-swatch" style="background:#f7a66a" data-col="#f7a66a" onclick="pickColor(this)"></div>
+    </div>
+    <button class="btn-add" style="width:100%;border-radius:12px;height:44px;font-size:14px;font-family:Sora,sans-serif;" onclick="addBlock()">Add Block</button>
+  </div>
+  <div class="section-title">Today's Schedule</div>
+  <div class="block-list" id="blockList"></div>
+</div>
+
+<!-- HABITS PAGE -->
+<div class="page" id="page-habits">
+  <div class="section-title">Add Habit</div>
+  <div class="habit-form">
+    <div class="input-row">
+      <input class="task-input" id="habitInput" placeholder="New habit…" />
+      <button class="btn-add" onclick="addHabit()">+</button>
+    </div>
+  </div>
+  <div class="section-title">Habits This Week</div>
+  <div class="habit-grid" id="habitGrid"></div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div class="page" id="page-settings">
+  <div class="install-banner">
+    <strong>📱 Install on iPhone</strong>
+    <div class="step"><div class="step-num">1</div><div>Open this page in Safari on your iPhone</div></div>
+    <div class="step"><div class="step-num">2</div><div>Tap the Share button (□↑) at the bottom</div></div>
+    <div class="step"><div class="step-num">3</div><div>Scroll and tap <strong>"Add to Home Screen"</strong></div></div>
+    <div class="step"><div class="step-num">4</div><div>Tap <strong>"Add"</strong> — it will appear like a native app!</div></div>
+  </div>
+
+  <div class="section-title">Timer Settings</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:14px;">Focus Duration</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn-circle" style="width:34px;height:34px;font-size:16px;" onclick="adjustSetting('focus',-5)">−</button>
+        <span id="focusVal" style="font-family:'Space Mono',monospace;font-size:16px;min-width:40px;text-align:center;">25m</span>
+        <button class="btn-circle" style="width:34px;height:34px;font-size:16px;" onclick="adjustSetting('focus',5)">+</button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;">Short Break</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn-circle" style="width:34px;height:34px;font-size:16px;" onclick="adjustSetting('short',-1)">−</button>
+        <span id="shortVal" style="font-family:'Space Mono',monospace;font-size:16px;min-width:40px;text-align:center;">5m</span>
+        <button class="btn-circle" style="width:34px;height:34px;font-size:16px;" onclick="adjustSetting('short',1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Data</div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <button onclick="exportData()" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--accent);font-family:'Sora',sans-serif;font-size:14px;text-align:left;cursor:pointer;">📤 Export Data (JSON)</button>
+    <button onclick="if(confirm('Clear all data?')){clearAll()}" style="background:var(--card);border:1px solid rgba(247,106,138,0.3);border-radius:12px;padding:14px 16px;color:var(--accent2);font-family:'Sora',sans-serif;font-size:14px;text-align:left;cursor:pointer;">🗑 Clear All Data</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="nav('home',this)">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">Home</div>
+  </button>
+  <button class="nav-btn" onclick="nav('timer',this)">
+    <div class="nav-icon">⏱</div>
+    <div class="nav-label">Timer</div>
+  </button>
+  <button class="nav-btn" onclick="nav('schedule',this)">
+    <div class="nav-icon">📅</div>
+    <div class="nav-label">Schedule</div>
+  </button>
+  <button class="nav-btn" onclick="nav('habits',this)">
+    <div class="nav-icon">✅</div>
+    <div class="nav-label">Habits</div>
+  </button>
+  <button class="nav-btn" onclick="nav('settings',this)">
+    <div class="nav-icon">⚙️</div>
+    <div class="nav-label">Settings</div>
+  </button>
+</nav>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let state = JSON.parse(localStorage.getItem('focusflow') || '{}');
+state.tasks = state.tasks || [];
+state.blocks = state.blocks || [];
+state.habits = state.habits || [];
+state.sessions = state.sessions || [];
+state.settings = state.settings || { focus: 25, short: 5 };
+state.focusMinutes = state.focusMinutes || 0;
+state.lastDate = state.lastDate || '';
+state.streak = state.streak || 0;
+
+function save() { localStorage.setItem('focusflow', JSON.stringify(state)); }
+
+// ─── DATE ─────────────────────────────────────────────────────────────────────
+const now = new Date();
+const todayKey = now.toISOString().split('T')[0];
+document.getElementById('headerDate').textContent =
+  now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+
+// Reset daily tasks on new day
+if (state.lastDate !== todayKey) {
+  state.tasks = state.tasks.filter(t => !t.done);
+  state.sessions = [];
+  state.focusMinutes = 0;
+  state.lastDate = todayKey;
+  save();
+}
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+function nav(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── TASKS ────────────────────────────────────────────────────────────────────
+let selectedPrio = 'med';
+function setPrio(p) {
+  selectedPrio = p;
+  ['high','med','low'].forEach(x => {
+    document.getElementById('prio'+x.charAt(0).toUpperCase()+x.slice(1)).className = 'prio-btn';
+  });
+  const map = {high:'selected-high',med:'selected-med',low:'selected-low'};
+  const ids = {high:'prioHigh',med:'prioMed',low:'prioLow'};
+  document.getElementById(ids[p]).classList.add(map[p]);
+}
+setPrio('med');
+
+function addTask() {
+  const input = document.getElementById('quickTaskInput');
+  const text = input.value.trim();
+  if (!text) return;
+  state.tasks.push({ id: Date.now(), text, prio: selectedPrio, done: false, time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}) });
+  input.value = '';
+  save(); renderTasks(); updateStats();
+}
+
+document.getElementById('quickTaskInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addTask();
+});
+
+function toggleTask(id) {
+  const t = state.tasks.find(t => t.id === id);
+  if (t) { t.done = !t.done; save(); renderTasks(); updateStats(); }
+}
+
+function deleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  save(); renderTasks(); updateStats();
+}
+
+function renderTasks() {
+  const list = document.getElementById('taskList');
+  const sorted = [...state.tasks].sort((a,b) => {
+    const prioOrder = {high:0,med:1,low:2};
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    return prioOrder[a.prio] - prioOrder[b.prio];
+  });
+  if (!sorted.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No tasks yet. Add one above!</div></div>';
+    return;
+  }
+  list.innerHTML = sorted.map(t => `
+    <div class="task-item ${t.done?'done':''}">
+      <div class="task-check ${t.done?'done':''}" onclick="toggleTask(${t.id})"></div>
+      <div class="task-body">
+        <div class="task-text ${t.done?'done':''}">${t.text}</div>
+        <div class="task-meta">
+          <div class="prio-dot ${t.prio}"></div>
+          <span class="task-time">${t.time}</span>
+        </div>
+      </div>
+      <button class="task-del" onclick="deleteTask(${t.id})">×</button>
+    </div>
+  `).join('');
+}
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('statDone').textContent = state.tasks.filter(t=>t.done).length;
+  document.getElementById('statPending').textContent = state.tasks.filter(t=>!t.done).length;
+  document.getElementById('statFocus').textContent = state.focusMinutes + 'm';
+  document.getElementById('statStreak').textContent = state.streak + '🔥';
+}
+
+// ─── TIMER ────────────────────────────────────────────────────────────────────
+let timerInterval = null;
+let timerRunning = false;
+let timerTotal = 25 * 60;
+let timerLeft = 25 * 60;
+let currentMode = 'focus';
+
+function setMode(mode, mins) {
+  if (timerRunning) return;
+  document.querySelectorAll('.mode-pill').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  currentMode = mode;
+  if (mode === 'custom') {
+    const m = parseInt(prompt('Custom minutes:', '30'));
+    if (m && m > 0) { timerTotal = m*60; timerLeft = m*60; }
+  } else {
+    const secs = (mode==='focus' ? state.settings.focus : mode==='short' ? state.settings.short : 15) * 60;
+    timerTotal = secs; timerLeft = secs;
+  }
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerLeft/60).toString().padStart(2,'0');
+  const s = (timerLeft%60).toString().padStart(2,'0');
+  document.getElementById('timerDisplay').textContent = m+':'+s;
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('startBtn').innerHTML = '▶';
+    document.getElementById('startBtn').classList.remove('running');
+    document.getElementById('timerGlow').classList.remove('active');
+  } else {
+    timerRunning = true;
+    document.getElementById('startBtn').innerHTML = '⏸';
+    document.getElementById('startBtn').classList.add('running');
+    document.getElementById('timerGlow').classList.add('active');
+    timerInterval = setInterval(() => {
+      timerLeft--;
+      updateTimerDisplay();
+      if (timerLeft <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('startBtn').innerHTML = '▶';
+        document.getElementById('startBtn').classList.remove('running');
+        document.getElementById('timerGlow').classList.remove('active');
+        if (currentMode === 'focus') {
+          const mins = Math.round(timerTotal/60);
+          state.focusMinutes += mins;
+          state.sessions.push({ time: new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}), mins });
+          save(); updateStats(); renderSessions();
+        }
+        try { new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAA==').play(); } catch(e){}
+        alert(currentMode === 'focus' ? '🎉 Focus session complete! Time for a break.' : '⚡ Break over! Time to focus.');
+        timerLeft = timerTotal;
+        updateTimerDisplay();
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerLeft = timerTotal;
+  document.getElementById('startBtn').innerHTML = '▶';
+  document.getElementById('startBtn').classList.remove('running');
+  document.getElementById('timerGlow').classList.remove('active');
+  updateTimerDisplay();
+}
+
+function skipTimer() {
+  resetTimer();
+  timerLeft = timerTotal;
+  updateTimerDisplay();
+}
+
+function renderSessions() {
+  const log = document.getElementById('sessionLog');
+  if (!state.sessions.length) {
+    log.innerHTML = '<div class="empty"><div class="empty-icon">⏱</div><div class="empty-text">No sessions yet today</div></div>';
+    return;
+  }
+  log.innerHTML = state.sessions.map((s,i) => `
+    <div class="task-item">
+      <div style="font-size:20px">🍅</div>
+      <div class="task-body">
+        <div class="task-text">Focus Session #${i+1}</div>
+        <div class="task-meta"><span class="task-time">${s.time} · ${s.mins}m</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── SCHEDULE ────────────────────────────────────────────────────────────────
+let selectedColor = '#7c6af7';
+function pickColor(el) {
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedColor = el.dataset.col;
+}
+
+function addBlock() {
+  const name = document.getElementById('blockName').value.trim();
+  const start = document.getElementById('blockStart').value;
+  const end = document.getElementById('blockEnd').value;
+  if (!name || !start || !end) { alert('Please fill all fields'); return; }
+  state.blocks.push({ id: Date.now(), name, start, end, color: selectedColor });
+  document.getElementById('blockName').value = '';
+  save(); renderBlocks();
+}
+
+function deleteBlock(id) {
+  state.blocks = state.blocks.filter(b => b.id !== id);
+  save(); renderBlocks();
+}
+
+function timeToMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function formatDur(start, end) {
+  const diff = timeToMin(end) - timeToMin(start);
+  if (diff <= 0) return '';
+  const h = Math.floor(diff/60), m = diff%60;
+  return h ? `${h}h ${m}m` : `${m}m`;
+}
+
+function renderBlocks() {
+  const list = document.getElementById('blockList');
+  const sorted = [...state.blocks].sort((a,b) => timeToMin(a.start) - timeToMin(b.start));
+  if (!sorted.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📅</div><div class="empty-text">No blocks yet. Add your first time block!</div></div>';
+    return;
+  }
+  list.innerHTML = sorted.map(b => `
+    <div class="block-item">
+      <div class="block-time-col">
+        <div class="block-start">${b.start}</div>
+        <div class="block-end">${b.end}</div>
+      </div>
+      <div class="block-bar" style="background:${b.color}"></div>
+      <div class="block-body">
+        <div class="block-name">${b.name}</div>
+        <div class="block-dur">${formatDur(b.start,b.end)}</div>
+      </div>
+      <button class="block-del" onclick="deleteBlock(${b.id})">×</button>
+    </div>
+  `).join('');
+}
+
+// ─── HABITS ──────────────────────────────────────────────────────────────────
+const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+const todayDow = now.getDay();
+
+function addHabit() {
+  const input = document.getElementById('habitInput');
+  const name = input.value.trim();
+  if (!name) return;
+  state.habits.push({ id: Date.now(), name, week: [false,false,false,false,false,false,false], streak: 0 });
+  input.value = '';
+  save(); renderHabits();
+}
+
+function toggleHabitDay(id, dayIdx) {
+  const h = state.habits.find(h => h.id === id);
+  if (!h) return;
+  h.week[dayIdx] = !h.week[dayIdx];
+  h.streak = h.week.filter(Boolean).length;
+  save(); renderHabits(); updateStats();
+}
+
+function deleteHabit(id) {
+  state.habits = state.habits.filter(h => h.id !== id);
+  save(); renderHabits();
+}
+
+function renderHabits() {
+  const grid = document.getElementById('habitGrid');
+  if (!state.habits.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><div class="empty-text">Add habits to track this week!</div></div>';
+    return;
+  }
+  grid.innerHTML = state.habits.map(h => `
+    <div class="habit-card">
+      <div class="habit-top">
+        <div class="habit-name">${h.name}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="habit-streak">${h.streak}🔥</div>
+          <button class="habit-del" onclick="deleteHabit(${h.id})">×</button>
+        </div>
+      </div>
+      <div class="habit-week">
+        ${DAYS.map((d,i) => `
+          <div class="habit-day ${h.week[i]?'done':''} ${i===todayDow?'today':''}"
+            onclick="toggleHabitDay(${h.id},${i})">${d}</div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+  // compute overall streak for stats
+  const maxStreak = state.habits.reduce((m,h)=>Math.max(m,h.streak),0);
+  state.streak = maxStreak;
+  save(); updateStats();
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+function adjustSetting(key, delta) {
+  state.settings[key] = Math.max(1, (state.settings[key]||5) + delta);
+  document.getElementById(key+'Val').textContent = state.settings[key]+'m';
+  if (key === 'focus' && currentMode === 'focus') {
+    timerTotal = state.settings.focus * 60;
+    if (!timerRunning) { timerLeft = timerTotal; updateTimerDisplay(); }
+  }
+  save();
+}
+
+function exportData() {
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'focusflow-data.json';
+  a.click();
+}
+
+function clearAll() {
+  localStorage.removeItem('focusflow');
+  location.reload();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.getElementById('focusVal').textContent = state.settings.focus + 'm';
+document.getElementById('shortVal').textContent = state.settings.short + 'm';
+timerTotal = state.settings.focus * 60;
+timerLeft = timerTotal;
+updateTimerDisplay();
+renderTasks();
+renderBlocks();
+renderHabits();
+renderSessions();
+updateStats();
+</script>
+</body>
+</html>
