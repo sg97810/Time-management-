@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T09:06:29.356Z",
+  "lastSynced": "2026-03-19T09:07:13.716Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -135,6 +135,13 @@
           "cat": "cat_1773910720090",
           "prio": "high",
           "done": true
+        },
+        {
+          "id": 1773911230712,
+          "text": "Tax file",
+          "cat": "personal",
+          "prio": "high",
+          "done": false
         }
       ],
       "slots": {},
