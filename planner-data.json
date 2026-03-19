@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-19T09:04:42.622Z",
+  "lastSynced": "2026-03-19T09:05:08.988Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -117,7 +117,7 @@
         },
         {
           "id": 1773911079620,
-          "text": "Polich varification",
+          "text": "Police varification",
           "cat": "personal",
           "prio": "high",
           "done": false
