@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "lastSynced": "2026-03-20T00:49:54.756Z",
+  "lastSynced": "2026-03-20T00:53:32.231Z",
   "settings": {
     "theme": "dark",
     "timeFrom": 6,
@@ -158,6 +158,32 @@
         ""
       ],
       "water": 1,
+      "mood": -1,
+      "energy": 0
+    },
+    "pl_day_2026-03-20": {
+      "intention": "",
+      "todos": [
+        {
+          "id": 1773968009231,
+          "text": "iuhpib",
+          "cat": "deep",
+          "prio": "med",
+          "done": false
+        }
+      ],
+      "slots": {},
+      "noteBrain": "",
+      "noteDefer": "",
+      "noteWait": "",
+      "noteCarry": "",
+      "dailyNotes": "",
+      "wins": [
+        "",
+        "",
+        ""
+      ],
+      "water": 0,
       "mood": -1,
       "energy": 0
     }
